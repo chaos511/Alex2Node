@@ -1,7 +1,7 @@
 {
   "name": "alex2node",
   "version": "1.0.0",
-  "description": "",
+  "description": "A Node.js library for creating Alexa-compatible devices using MQTT, based on Alex2MQTT.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -11,15 +11,34 @@
   },
   "type": "commonjs",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "prepare": "npm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "alexa",
+    "mqtt",
+    "smart-home",
+    "iot",
+    "home-automation",
+    "amazon-alexa",
+    "alex2mqtt"
+  ],
+  "author": "user511",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chaos511/alex2node"
+  },
+  "bugs": {
+    "url": "https://github.com/chaos511/alex2node/issues"
+  },
+  "homepage": "https://github.com/chaos511/alex2node#readme",
   "devDependencies": {
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "dotenv": "^16.5.0"
   },
   "dependencies": {
-    "dotenv": "^16.5.0"
+    "mqtt": "^5.10.3",
+    "uuid": "^11.0.3"
   }
 }
