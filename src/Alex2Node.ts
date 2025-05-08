@@ -1,7 +1,8 @@
 import mqtt, { MqttClient } from "mqtt";
 import Device from "./Device";
+import { EventEmitter } from "events";
 
-class Alex2MQTT {
+class Alex2MQTT extends EventEmitter {
   private client: MqttClient | null = null;
   private devices: Device[] = [];
   private MqttHost = "mqtt://Alex2MQTT.stormysdream.club";
@@ -11,7 +12,10 @@ class Alex2MQTT {
     private password: string,
     private rootTopic: string,
     private debugLogging: boolean
-  ) {}
+  ) {
+    super(); // Initialize EventEmitter
+  }
+  
 
   connect(): void {
     const options = {
@@ -31,7 +35,8 @@ class Alex2MQTT {
           console.log("[Alex2Node.ts] Subscribed to topics");
         }
         if (err) {
-          throw err;
+          console.error("[Alex2Node.ts] MQTT connection error:", err);
+          this.emit("error", err);
         }
       });
     });
@@ -56,7 +61,8 @@ class Alex2MQTT {
             JSON.stringify(deviceArray),
             (err) => {
               if (err) {
-                throw err;
+                console.error("[Alex2Node.ts] MQTT connection error:", err);
+                this.emit("error", err);
               } else if (this.debugLogging) {
                 console.log(
                   `[Alex2Node.ts] Discovery payloads published to ${
@@ -109,7 +115,8 @@ class Alex2MQTT {
       if (this.debugLogging) {
         console.error("[Alex2Node.ts] Connection failed:", err);
       }
-      throw err;
+      console.error("[Alex2Node.ts] MQTT connection error:", err);
+      this.emit("error", err);
     });
   }
 

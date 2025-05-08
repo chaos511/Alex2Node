@@ -5,8 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mqtt_1 = __importDefault(require("mqtt"));
 const Device_1 = __importDefault(require("./Device"));
-class Alex2MQTT {
+const events_1 = require("events");
+class Alex2MQTT extends events_1.EventEmitter {
     constructor(username, password, rootTopic, debugLogging) {
+        super(); // Initialize EventEmitter
         this.username = username;
         this.password = password;
         this.rootTopic = rootTopic;
@@ -30,7 +32,8 @@ class Alex2MQTT {
                     console.log("[Alex2Node.ts] Subscribed to topics");
                 }
                 if (err) {
-                    throw err;
+                    console.error("[Alex2Node.ts] MQTT connection error:", err);
+                    this.emit("error", err);
                 }
             });
         });
@@ -48,7 +51,8 @@ class Alex2MQTT {
                 if (deviceArray.length > 0) {
                     this.client.publish(topic + "_r", JSON.stringify(deviceArray), (err) => {
                         if (err) {
-                            throw err;
+                            console.error("[Alex2Node.ts] MQTT connection error:", err);
+                            this.emit("error", err);
                         }
                         else if (this.debugLogging) {
                             console.log(`[Alex2Node.ts] Discovery payloads published to ${topic + "_r"}`);
@@ -94,7 +98,8 @@ class Alex2MQTT {
             if (this.debugLogging) {
                 console.error("[Alex2Node.ts] Connection failed:", err);
             }
-            throw err;
+            console.error("[Alex2Node.ts] MQTT connection error:", err);
+            this.emit("error", err);
         });
     }
     registerDevice(name, endpointId) {
