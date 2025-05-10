@@ -1,6 +1,7 @@
 import mqtt, { MqttClient } from "mqtt";
 import Device from "./Device";
 import { EventEmitter } from "events";
+import { DisplayCategory } from "./DisplayCategory";
 
 class Alex2MQTT extends EventEmitter {
   private client: MqttClient | null = null;
@@ -15,7 +16,6 @@ class Alex2MQTT extends EventEmitter {
   ) {
     super(); // Initialize EventEmitter
   }
-  
 
   connect(): void {
     const options = {
@@ -69,7 +69,7 @@ class Alex2MQTT extends EventEmitter {
                     topic + "_r"
                   }`
                 );
-                console.log(deviceArray);
+                console.log(JSON.stringify(deviceArray, null, 2));
               }
             }
           );
@@ -106,8 +106,8 @@ class Alex2MQTT extends EventEmitter {
             );
           }
           device.emit("ReportState", payload);
-        }else{
-          device.emit("Event", payload,payload.header.namespace);
+        } else {
+          device.emit("Event", payload, payload.header.namespace);
         }
       }
     });
@@ -120,7 +120,11 @@ class Alex2MQTT extends EventEmitter {
     });
   }
 
-  registerDevice(name: string, endpointId: string): Device {
+  registerDevice(
+    name: string,
+    endpointId: string,
+    displayCategory: DisplayCategory | DisplayCategory[] | null
+  ): Device {
     if (!this.client) {
       throw new Error("Must call connect before creating devices");
     }
@@ -129,7 +133,20 @@ class Alex2MQTT extends EventEmitter {
         `[Alex2Node.ts] Creating new device with endpoint: ${endpointId}`
       );
     }
-    const device = new Device(this.client!, this.rootTopic, name, endpointId);
+    const normalizedCategory =
+      displayCategory === null
+        ? null
+        : Array.isArray(displayCategory)
+        ? displayCategory
+        : [displayCategory];
+
+    const device = new Device(
+      this.client!,
+      this.rootTopic,
+      name,
+      endpointId,
+      normalizedCategory
+    );
     this.devices.push(device);
     return device;
   }

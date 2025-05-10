@@ -5,7 +5,7 @@ const DisplayCategory_1 = require("./DisplayCategory");
 const events_1 = require("events");
 const AlexaStatusMessage_1 = require("./AlexaStatusMessage");
 class Device extends events_1.EventEmitter {
-    constructor(mqttClient, rootTopic, name, endpointId, displayCategory = DisplayCategory_1.DisplayCategory.LIGHT, description = "Alexa to Node.js bridge", manufacturerName = "Alex2Node", manufacturer = "Alex2Node", model = "Alex2Node_v1.0.0") {
+    constructor(mqttClient, rootTopic, name, endpointId, displayCategory, description = "Alexa to Node.js bridge", manufacturerName = "Alex2Node", manufacturer = "Alex2Node", model = "Alex2Node_v1.0.0") {
         super();
         this.mqttClient = mqttClient;
         this.rootTopic = rootTopic;
@@ -29,10 +29,10 @@ class Device extends events_1.EventEmitter {
         return this.endpointId;
     }
     setDisplayCategory(category) {
-        this.displayCategory = category;
+        this.displayCategory = Array.isArray(category) ? category : [category];
     }
     getDisplayCategory() {
-        return this.displayCategory;
+        return this.displayCategory || [DisplayCategory_1.DisplayCategory.LIGHT];
     }
     setDescription(description) {
         this.description = description;
@@ -82,7 +82,7 @@ class Device extends events_1.EventEmitter {
             friendlyName: this.name,
             description: this.description,
             manufacturerName: this.manufacturerName,
-            displayCategories: [this.displayCategory],
+            displayCategories: this.getDisplayCategory(),
             additionalAttributes: {
                 manufacturer: this.manufacturer,
                 model: this.model,

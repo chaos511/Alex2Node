@@ -56,7 +56,7 @@ class Alex2MQTT extends events_1.EventEmitter {
                         }
                         else if (this.debugLogging) {
                             console.log(`[Alex2Node.ts] Discovery payloads published to ${topic + "_r"}`);
-                            console.log(deviceArray);
+                            console.log(JSON.stringify(deviceArray, null, 2));
                         }
                     });
                 }
@@ -102,14 +102,19 @@ class Alex2MQTT extends events_1.EventEmitter {
             this.emit("error", err);
         });
     }
-    registerDevice(name, endpointId) {
+    registerDevice(name, endpointId, displayCategory) {
         if (!this.client) {
             throw new Error("Must call connect before creating devices");
         }
         if (this.debugLogging) {
             console.log(`[Alex2Node.ts] Creating new device with endpoint: ${endpointId}`);
         }
-        const device = new Device_1.default(this.client, this.rootTopic, name, endpointId);
+        const normalizedCategory = displayCategory === null
+            ? null
+            : Array.isArray(displayCategory)
+                ? displayCategory
+                : [displayCategory];
+        const device = new Device_1.default(this.client, this.rootTopic, name, endpointId, normalizedCategory);
         this.devices.push(device);
         return device;
     }

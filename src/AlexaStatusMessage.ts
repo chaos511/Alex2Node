@@ -7,6 +7,15 @@ export enum EndpointHealth {
   UNREACHABLE = "UNREACHABLE",
 }
 
+export enum ThermostatMode {
+  OFF = "OFF",
+  HEAT = "HEAT",
+  COOL = "COOL",
+  AUTO = "AUTO",
+  ECO = "ECO",
+  CUSTOM = "CUSTOM",
+}
+
 export enum PowerController {
   ON = "ON",
   OFF = "OFF",
@@ -101,6 +110,38 @@ export class AlexaStatusMessage {
     this.context.properties.push(prop);
     return this;
   }
+  public addThermostatModeProp(
+    mode: string,
+    uncertaintyInMs = 0
+  ): this {
+    return this.addProperty(
+      AlexaInterfaceType.THERMOSTAT_CONTROLLER,
+      "thermostatMode",
+      mode,
+      uncertaintyInMs
+    );
+  }
+
+  public addThermostatControllerProp(
+    name: "lowerSetpoint" | "upperSetpoint" | "targetSetpoint",
+    scale: TemperatureSensorScale,
+    value: number,
+    uncertaintyInMs = 0
+  ): this {
+    const tempValue = {
+      value:
+        scale === TemperatureSensorScale.FAHRENHEIT
+          ? (value - 32) * (5 / 9)
+          : value,
+      scale: "CELSIUS",
+    };
+    return this.addProperty(
+      AlexaInterfaceType.THERMOSTAT_CONTROLLER,
+      name,
+      tempValue,
+      uncertaintyInMs
+    );
+  }
 
   public addHealthProp(health: EndpointHealth, uncertaintyInMs = 0): this {
     return this.addProperty(
@@ -191,7 +232,7 @@ export class AlexaStatusMessage {
       context: this.context,
       event: this.event,
     };
-    const topic = `${this.rootTopic}/${this.endpointId}/alexaResponce`;//Yes this should be response but it is incorrect in both Alex2MQTT and Alex2ESP so for consistency is is wrong here too
+    const topic = `${this.rootTopic}/${this.endpointId}/alexaResponce`; //Yes this should be response but it is incorrect in both Alex2MQTT and Alex2ESP so for consistency is is wrong here too
     const payloadStr = JSON.stringify(payload);
 
     this.mqttClient.publish(topic, payloadStr, (err) => {

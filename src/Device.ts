@@ -13,7 +13,7 @@ class Device extends EventEmitter {
     private rootTopic: string,
     public name: string,
     public endpointId: string,
-    public displayCategory: DisplayCategory = DisplayCategory.LIGHT,
+    public displayCategory: Array<DisplayCategory> | null,
     public description: string = "Alexa to Node.js bridge",
     public manufacturerName: string = "Alex2Node",
     public manufacturer: string = "Alex2Node",
@@ -34,12 +34,12 @@ class Device extends EventEmitter {
     return this.endpointId;
   }
 
-  setDisplayCategory(category: DisplayCategory): void {
-    this.displayCategory = category;
+  setDisplayCategory(category: DisplayCategory | DisplayCategory[]): void {
+    this.displayCategory = Array.isArray(category) ? category : [category];
   }
-
-  getDisplayCategory(): DisplayCategory {
-    return this.displayCategory;
+  
+  getDisplayCategory(): Array<DisplayCategory> {
+    return this.displayCategory ||[DisplayCategory.LIGHT]; 
   }
 
   setDescription(description: string): void {
@@ -111,7 +111,7 @@ class Device extends EventEmitter {
       friendlyName: this.name,
       description: this.description,
       manufacturerName: this.manufacturerName,
-      displayCategories: [this.displayCategory],
+      displayCategories: this.getDisplayCategory(),
       additionalAttributes: {
         manufacturer: this.manufacturer,
         model: this.model,

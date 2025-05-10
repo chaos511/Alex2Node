@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AlexaStatusMessage = exports.TemperatureSensorScale = exports.PowerController = exports.EndpointHealth = void 0;
+exports.AlexaStatusMessage = exports.TemperatureSensorScale = exports.PowerController = exports.ThermostatMode = exports.EndpointHealth = void 0;
 const uuid_1 = require("uuid");
 const AlexaInterface_1 = require("./AlexaInterface");
 var EndpointHealth;
@@ -8,6 +8,15 @@ var EndpointHealth;
     EndpointHealth["OK"] = "OK";
     EndpointHealth["UNREACHABLE"] = "UNREACHABLE";
 })(EndpointHealth || (exports.EndpointHealth = EndpointHealth = {}));
+var ThermostatMode;
+(function (ThermostatMode) {
+    ThermostatMode["OFF"] = "OFF";
+    ThermostatMode["HEAT"] = "HEAT";
+    ThermostatMode["COOL"] = "COOL";
+    ThermostatMode["AUTO"] = "AUTO";
+    ThermostatMode["ECO"] = "ECO";
+    ThermostatMode["CUSTOM"] = "CUSTOM";
+})(ThermostatMode || (exports.ThermostatMode = ThermostatMode = {}));
 var PowerController;
 (function (PowerController) {
     PowerController["ON"] = "ON";
@@ -56,6 +65,18 @@ class AlexaStatusMessage {
             prop.instance = instance;
         this.context.properties.push(prop);
         return this;
+    }
+    addThermostatModeProp(mode, uncertaintyInMs = 0) {
+        return this.addProperty(AlexaInterface_1.AlexaInterfaceType.THERMOSTAT_CONTROLLER, "thermostatMode", mode, uncertaintyInMs);
+    }
+    addThermostatControllerProp(name, scale, value, uncertaintyInMs = 0) {
+        const tempValue = {
+            value: scale === TemperatureSensorScale.FAHRENHEIT
+                ? (value - 32) * (5 / 9)
+                : value,
+            scale: "CELSIUS",
+        };
+        return this.addProperty(AlexaInterface_1.AlexaInterfaceType.THERMOSTAT_CONTROLLER, name, tempValue, uncertaintyInMs);
     }
     addHealthProp(health, uncertaintyInMs = 0) {
         return this.addProperty(AlexaInterface_1.AlexaInterfaceType.ENDPOINT_HEALTH, "connectivity", { value: health }, uncertaintyInMs);

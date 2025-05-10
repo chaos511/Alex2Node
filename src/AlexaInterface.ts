@@ -176,11 +176,12 @@ export class AlexaInterface {
       case AlexaInterfaceType.SCENE_CONTROLLER:
       case AlexaInterfaceType.SEEK_CONTROLLER:
       case AlexaInterfaceType.TEMPERATURE_SENSOR:
-      case AlexaInterfaceType.THERMOSTAT_CONTROLLER:
       case AlexaInterfaceType.TOGGLE_CONTROLLER:
         return "3";
       case AlexaInterfaceType.LAUNCHER:
         return "1.1";
+      case AlexaInterfaceType.THERMOSTAT_CONTROLLER:
+        return "3.2";
       case AlexaInterfaceType.ENDPOINT_HEALTH:
         return "3.3";
       default:
@@ -210,7 +211,13 @@ export class AlexaInterface {
         return ["toggleState"];
       case AlexaInterfaceType.TEMPERATURE_SENSOR:
         return ["temperature"];
-
+      case AlexaInterfaceType.THERMOSTAT_CONTROLLER:
+        return [
+          "lowerSetpoint",
+          "upperSetpoint",
+          "thermostatMode",
+          "adaptiveRecoveryStatus",
+        ];
       case AlexaInterfaceType.APPLICATION_STATE_REPORTER:
       case AlexaInterfaceType.AUDIO_PLAY_QUEUE:
       case AlexaInterfaceType.AUTHORIZATION_CONTROLLER:
@@ -252,7 +259,6 @@ export class AlexaInterface {
       case AlexaInterfaceType.SMART_VISION_SNAPSHOT_PROVIDER:
       case AlexaInterfaceType.SPEAKER:
       case AlexaInterfaceType.STEP_SPEAKER:
-      case AlexaInterfaceType.THERMOSTAT_CONTROLLER:
       case AlexaInterfaceType.THERMOSTAT_CONTROLLER_CONFIGURATION:
       case AlexaInterfaceType.THERMOSTAT_CONTROLLER_HVAC_COMPONENTS:
       case AlexaInterfaceType.THERMOSTAT_CONTROLLER_SCHEDULE:
@@ -277,9 +283,15 @@ export class AlexaInterface {
       properties: {
         retrievable: this.retrievable,
         proactivelyReported: this.proactivelyReported,
-        supported: [{ name: this.getProps()[0] }],
+        supported: this.getProps().map(name => ({ name })),
       },
     };
+    if(this.type==AlexaInterfaceType.THERMOSTAT_CONTROLLER){
+      doc.configuration={
+        "supportedModes": ["HEAT", "COOL", "AUTO", "OFF"],
+        "supportsScheduling": false
+      }
+    }
     if (this.instance) {
       doc.instance = this.instance;
     }

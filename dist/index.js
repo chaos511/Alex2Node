@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PowerController = exports.AlexaActions = exports.ActionMapping = exports.AlexaInterfaceType = exports.Alex2MQTT = void 0;
+exports.ThermostatMode = exports.TemperatureSensorScale = exports.EndpointHealth = exports.PowerController = exports.DisplayCategory = exports.AlexaActions = exports.ActionMapping = exports.AlexaInterfaceType = exports.Alex2MQTT = void 0;
 var Alex2Node_1 = require("./Alex2Node");
 Object.defineProperty(exports, "Alex2MQTT", { enumerable: true, get: function () { return __importDefault(Alex2Node_1).default; } });
 var AlexaInterface_1 = require("./AlexaInterface");
@@ -11,5 +11,10 @@ Object.defineProperty(exports, "AlexaInterfaceType", { enumerable: true, get: fu
 var ActionMapping_1 = require("./ActionMapping");
 Object.defineProperty(exports, "ActionMapping", { enumerable: true, get: function () { return ActionMapping_1.ActionMapping; } });
 Object.defineProperty(exports, "AlexaActions", { enumerable: true, get: function () { return ActionMapping_1.AlexaActions; } });
+var DisplayCategory_1 = require("./DisplayCategory");
+Object.defineProperty(exports, "DisplayCategory", { enumerable: true, get: function () { return DisplayCategory_1.DisplayCategory; } });
 var AlexaStatusMessage_1 = require("./AlexaStatusMessage");
 Object.defineProperty(exports, "PowerController", { enumerable: true, get: function () { return AlexaStatusMessage_1.PowerController; } });
+Object.defineProperty(exports, "EndpointHealth", { enumerable: true, get: function () { return AlexaStatusMessage_1.EndpointHealth; } });
+Object.defineProperty(exports, "TemperatureSensorScale", { enumerable: true, get: function () { return AlexaStatusMessage_1.TemperatureSensorScale; } });
+Object.defineProperty(exports, "ThermostatMode", { enumerable: true, get: function () { return AlexaStatusMessage_1.ThermostatMode; } });
