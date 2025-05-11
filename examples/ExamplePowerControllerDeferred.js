@@ -19,41 +19,51 @@ const rootTopic = process.env.MQTT_ROOT_TOPIC;
 const alex2NodeClient = new Alex2MQTT(username, password, rootTopic, false);
 alex2NodeClient.connect(); // Connect to the MQTT broker
 
-// Define the device name (bedroom light)
-const deviceName = "Bedroom Light";
+// Define the device name (deferred light)
+const deviceName = "Deferred Light";
 
 // Register the device with a unique endpoint ID (you can use something like "endpoint1")
-const bedroomLight = alex2NodeClient.registerDevice(deviceName, "endpoint2");
+const deferredLight = alex2NodeClient.registerDevice(deviceName, "endpoint3");
 
 // Add the PowerController capability (for turning on/off the device)
-bedroomLight.addCapability(AlexaInterfaceType.POWER_CONTROLLER);
+deferredLight.addCapability(AlexaInterfaceType.POWER_CONTROLLER);
 
 // Log the device name to verify registration
-console.log(bedroomLight.getName());
+console.log(deferredLight.getName());
 
 /**
  * Handle Alexa's ReportState directive.
  * This occurs when Alexa queries the current state of the device (e.g., during routines or device status checks).
  */
-bedroomLight.on("ReportState", (payload) => {
+deferredLight.on("ReportState", (payload) => {
   console.log("ReportState received!", payload);
 
   const { correlationToken } = payload.header;
 
-  const status = bedroomLight.getStatusMessage(correlationToken);
+  // Step 1: Send a DeferredResponse after ~1 second
+  setTimeout(() => {
+    const deferred = deferredLight.getStatusMessage(correlationToken, false, true); // isDeferred = true
+    deferred.addEstimatedDeferralTime(20).send();
+    console.log("Sent DeferredResponse");
+  }, 2000); // simulate slight delay before deferred response
 
-  status
-    .addHealthProp("OK") // Device is healthy
-    .addPowerControllerProp(outputState); // Report the current power state (ON/OFF)
-
-  status.send(); // Send the state report back to Alexa
+  // Step 2: Send actual StateReport after 10 seconds
+  setTimeout(() => {
+    const status = deferredLight.getStatusMessage(correlationToken,false,false); // normal StateReport
+    status
+      .addHealthProp("OK")
+      .addPowerControllerProp(outputState)
+      .send(true);
+    console.log("Sent actual StateReport with device status");
+  }, 8000);
 });
+
 
 /**
  * Handle incoming control directives (e.g., TurnOn, TurnOff).
  * These directives come from Alexa when a user issues a command.
  */
-bedroomLight.on("Event", (directive, interfaceType) => {
+deferredLight.on("Event", (directive, interfaceType) => {
   console.log("Event received", { directive, interfaceType });
 
   // Ensure the interfaceType is either PowerController or other valid interfaces
@@ -64,14 +74,14 @@ bedroomLight.on("Event", (directive, interfaceType) => {
     // Update the internal state based on the command (TurnOn / TurnOff)
     if (name === "TurnOn") {
       outputState = PowerController.ON;
-      console.log("Turning ON the Bedroom Light");
+      console.log("Turning ON the Deferred Light");
     } else if (name === "TurnOff") {
       outputState = PowerController.OFF;
-      console.log("Turning OFF the Bedroom Light");
+      console.log("Turning OFF the Deferred Light");
     }
 
     // Respond to the directive with the updated device status
-    const status = bedroomLight.getStatusMessage(token, true);
+    const status = deferredLight.getStatusMessage(token, true);
     status
       .addHealthProp("OK")
       .addPowerControllerProp(outputState)

@@ -54,7 +54,7 @@ const deviceData = {
 thermostat.on("ReportState", (payload) => {
   // console.log("ReportState received!", payload);
 
-  const { correlationToken } = payload;
+  const { correlationToken } = payload.header;
 
   let status = thermostat.getStatusMessage(correlationToken);
 

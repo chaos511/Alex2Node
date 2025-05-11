@@ -57,22 +57,28 @@ export class AlexaStatusMessage {
   private rootTopic: string;
   private endpointId: string;
   private mqttClient: MqttClient;
+  private isDeferred: boolean;
 
   constructor(
     correlationToken: string,
     rootTopic: string,
     endpointId: string,
     mqttClient: MqttClient,
-    isResponse: boolean = false
+    isResponse: boolean = false,
+    isDeferred: boolean = false
   ) {
     this.rootTopic = rootTopic;
     this.endpointId = endpointId;
     this.mqttClient = mqttClient;
-
+    this.isDeferred = isDeferred;
     this.event = {
       header: {
         namespace: "Alexa",
-        name: isResponse ? "Response" : "StateReport",
+        name: isDeferred
+          ? "DeferredResponse"
+          : isResponse
+          ? "Response"
+          : "StateReport",
         payloadVersion: "3",
         messageId: this.generateMessageId(),
         correlationToken,
@@ -91,7 +97,6 @@ export class AlexaStatusMessage {
   private getTimestamp(): string {
     return new Date().toISOString();
   }
-
   private addProperty(
     namespace: AlexaInterfaceType,
     name: string,
@@ -110,16 +115,25 @@ export class AlexaStatusMessage {
     this.context.properties.push(prop);
     return this;
   }
-  public addThermostatModeProp(
-    mode: string,
-    uncertaintyInMs = 0
-  ): this {
+  public addThermostatModeProp(mode: string, uncertaintyInMs = 0): this {
     return this.addProperty(
       AlexaInterfaceType.THERMOSTAT_CONTROLLER,
       "thermostatMode",
       mode,
       uncertaintyInMs
     );
+  }
+  public addEstimatedDeferralTime(seconds: number): this {
+    if (this.isDeferred) {
+      this.event.payload = {
+        estimatedDeferralInSeconds: seconds,
+      };
+    } else {
+      console.warn(
+        "[AlexaStatusMessage.ts] Attempted to add estimated deferral time, but message is not marked as DeferredResponse."
+      );
+    }
+    return this;
   }
 
   public addThermostatControllerProp(
@@ -227,12 +241,12 @@ export class AlexaStatusMessage {
     return this;
   }
 
-  public send(): void {
+  public send(sendAsync: boolean): void {
     const payload = {
-      context: this.context,
+      context: this.isDeferred ? null : this.context,
       event: this.event,
     };
-    const topic = `${this.rootTopic}/${this.endpointId}/alexaResponce`; //Yes this should be response but it is incorrect in both Alex2MQTT and Alex2ESP so for consistency is is wrong here too
+    const topic = `${this.rootTopic}/${this.endpointId}/${sendAsync?"deferredResponse":"alexaResponce"}`; //Yes this should be response but it is incorrect in both Alex2MQTT and Alex2ESP so for consistency is is wrong here too
     const payloadStr = JSON.stringify(payload);
 
     this.mqttClient.publish(topic, payloadStr, (err) => {
@@ -242,7 +256,7 @@ export class AlexaStatusMessage {
           err
         );
       } else {
-        // console.log(`[AlexaStatusMessage] Sent message to ${topic}`);
+        console.log(`[AlexaStatusMessage] Sent message to ${topic}`);
       }
     });
   }

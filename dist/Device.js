@@ -40,8 +40,8 @@ class Device extends events_1.EventEmitter {
     getDescription() {
         return this.description;
     }
-    getStatusMessage(correlationToken, isResponse = false) {
-        return new AlexaStatusMessage_1.AlexaStatusMessage(correlationToken, this.rootTopic, this.endpointId, this.mqttClient, isResponse);
+    getStatusMessage(correlationToken, isResponse = false, isDeferred = false) {
+        return new AlexaStatusMessage_1.AlexaStatusMessage(correlationToken, this.rootTopic, this.endpointId, this.mqttClient, isResponse, isDeferred);
     }
     setManufacturerName(name) {
         this.manufacturerName = name;

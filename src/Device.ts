@@ -51,14 +51,16 @@ class Device extends EventEmitter {
   }
   getStatusMessage(
     correlationToken: string,
-    isResponse = false
+    isResponse = false,
+    isDeferred = false,
   ): AlexaStatusMessage {
     return new AlexaStatusMessage(
       correlationToken,
       this.rootTopic,
       this.endpointId,
       this.mqttClient,
-      isResponse
+      isResponse,
+      isDeferred
     );
   }
   setManufacturerName(name: string): void {
