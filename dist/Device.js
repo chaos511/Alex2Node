@@ -4,6 +4,7 @@ const AlexaInterface_1 = require("./AlexaInterface");
 const DisplayCategory_1 = require("./DisplayCategory");
 const events_1 = require("events");
 const AlexaStatusMessage_1 = require("./AlexaStatusMessage");
+const AlexaErrorResponse_1 = require("./AlexaErrorResponse");
 class Device extends events_1.EventEmitter {
     constructor(mqttClient, rootTopic, name, endpointId, displayCategory, description = "Alexa to Node.js bridge", manufacturerName = "Alex2Node", manufacturer = "Alex2Node", model = "Alex2Node_v1.0.0") {
         super();
@@ -39,6 +40,9 @@ class Device extends events_1.EventEmitter {
     }
     getDescription() {
         return this.description;
+    }
+    getErrorMessage(correlationToken) {
+        return new AlexaErrorResponse_1.AlexaErrorResponse(correlationToken, this.rootTopic, this.endpointId, this.mqttClient);
     }
     getStatusMessage(correlationToken, isResponse = false, isDeferred = false) {
         return new AlexaStatusMessage_1.AlexaStatusMessage(correlationToken, this.rootTopic, this.endpointId, this.mqttClient, isResponse, isDeferred);

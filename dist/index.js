@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ThermostatMode = exports.TemperatureSensorScale = exports.EndpointHealth = exports.PowerController = exports.DisplayCategory = exports.AlexaActions = exports.ActionMapping = exports.AlexaInterfaceType = exports.Alex2MQTT = void 0;
+exports.AlexaErrorResponse = exports.AlexaErrorType = exports.ThermostatMode = exports.TemperatureSensorScale = exports.EndpointHealth = exports.PowerController = exports.DisplayCategory = exports.AlexaActions = exports.ActionMapping = exports.AlexaInterfaceType = exports.Alex2MQTT = void 0;
 var Alex2Node_1 = require("./Alex2Node");
 Object.defineProperty(exports, "Alex2MQTT", { enumerable: true, get: function () { return __importDefault(Alex2Node_1).default; } });
 var AlexaInterface_1 = require("./AlexaInterface");
@@ -18,3 +18,6 @@ Object.defineProperty(exports, "PowerController", { enumerable: true, get: funct
 Object.defineProperty(exports, "EndpointHealth", { enumerable: true, get: function () { return AlexaStatusMessage_1.EndpointHealth; } });
 Object.defineProperty(exports, "TemperatureSensorScale", { enumerable: true, get: function () { return AlexaStatusMessage_1.TemperatureSensorScale; } });
 Object.defineProperty(exports, "ThermostatMode", { enumerable: true, get: function () { return AlexaStatusMessage_1.ThermostatMode; } });
+var AlexaErrorResponse_1 = require("./AlexaErrorResponse");
+Object.defineProperty(exports, "AlexaErrorType", { enumerable: true, get: function () { return AlexaErrorResponse_1.AlexaErrorType; } });
+Object.defineProperty(exports, "AlexaErrorResponse", { enumerable: true, get: function () { return AlexaErrorResponse_1.AlexaErrorResponse; } });

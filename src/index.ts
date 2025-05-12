@@ -3,3 +3,4 @@ export { AlexaInterfaceType } from './AlexaInterface';
 export { ActionMapping, AlexaActions } from './ActionMapping';
 export {DisplayCategory} from "./DisplayCategory";
 export { PowerController,EndpointHealth,TemperatureSensorScale,ThermostatMode } from './AlexaStatusMessage';
+export { AlexaErrorType,AlexaErrorResponse} from './AlexaErrorResponse';

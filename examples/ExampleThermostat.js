@@ -45,11 +45,11 @@ console.log(thermostat.getName());
  */
 
 const deviceData = {
-  lowerSetpoint: 20,
-  upperSetpoint: 20,
-  targetSetpoint: 20,
-  current: 20,
-  thermostatMode: ThermostatMode.AUTO,
+  lowerSetpoint: 50,
+  upperSetpoint: 70,
+  targetSetpoint: 60,
+  current: 69,
+  thermostatMode: ThermostatMode.HEAT,
 };
 thermostat.on("ReportState", (payload) => {
   // console.log("ReportState received!", payload);
@@ -101,17 +101,17 @@ thermostat.on("Event", (directive, interfaceType) => {
     if (name == "SetTargetTemperature") {
       console.log({ name: directive.payload });
       if (directive.payload.upperSetpoint) {
-        deviceData.upperSetpoint = praseTempValue(
+        deviceData.upperSetpoint = parseTempValue(
           directive.payload.upperSetpoint
         );
       }
       if (directive.payload.lowerSetpoint) {
-        deviceData.lowerSetpoint = praseTempValue(
+        deviceData.lowerSetpoint = parseTempValue(
           directive.payload.lowerSetpoint
         );
       }
       if (directive.payload.targetSetpoint) {
-        deviceData.targetSetpoint = praseTempValue(
+        deviceData.targetSetpoint = parseTempValue(
           directive.payload.targetSetpoint
         );
       }
@@ -128,7 +128,7 @@ thermostat.on("Event", (directive, interfaceType) => {
     status
       .addHealthProp("OK") // Device is healthy and reachable
       .addTemperatureSensorProp(
-        TemperatureSensorScale.CELSIUS,
+        TemperatureSensorScale.FAHRENHEIT,
         deviceData.current
       ) // Report current temperature
       .addThermostatModeProp(deviceData.thermostatMode); // Report current thermostat mode
@@ -136,18 +136,18 @@ thermostat.on("Event", (directive, interfaceType) => {
       status = status
         .addThermostatControllerProp(
           "lowerSetpoint",
-          TemperatureSensorScale.CELSIUS,
+          TemperatureSensorScale.FAHRENHEIT,
           deviceData.lowerSetpoint
         ) // Lower bound of temperature range
         .addThermostatControllerProp(
           "upperSetpoint",
-          TemperatureSensorScale.CELSIUS,
+          TemperatureSensorScale.FAHRENHEIT,
           deviceData.upperSetpoint
         ); // Upper bound of temperature range
     } else {
       status = status.addThermostatControllerProp(
         "targetSetpoint",
-        TemperatureSensorScale.CELSIUS,
+        TemperatureSensorScale.FAHRENHEIT,
         deviceData.targetSetpoint
       ); // Lower bound of temperature range
     }
@@ -155,6 +155,13 @@ thermostat.on("Event", (directive, interfaceType) => {
   }
 });
 
-function praseTempValue(data) {
-  return data.value;
+function parseTempValue(data) {
+  console.log(data);
+
+  if (data.scale === "FAHRENHEIT") {
+    return data.value;
+  }
+
+  const fahrenheit = (data.value * 9) / 5 + 32;
+  return fahrenheit;
 }

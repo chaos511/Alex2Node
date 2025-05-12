@@ -3,6 +3,7 @@ import { DisplayCategory } from "./DisplayCategory";
 import { EventEmitter } from "events";
 import { MqttClient } from "mqtt";
 import { AlexaStatusMessage } from "./AlexaStatusMessage";
+import { AlexaErrorResponse } from "./AlexaErrorResponse";
 
 class Device extends EventEmitter {
   protected softwareVersion: string = "1.0.0";
@@ -37,9 +38,9 @@ class Device extends EventEmitter {
   setDisplayCategory(category: DisplayCategory | DisplayCategory[]): void {
     this.displayCategory = Array.isArray(category) ? category : [category];
   }
-  
+
   getDisplayCategory(): Array<DisplayCategory> {
-    return this.displayCategory ||[DisplayCategory.LIGHT]; 
+    return this.displayCategory || [DisplayCategory.LIGHT];
   }
 
   setDescription(description: string): void {
@@ -49,10 +50,18 @@ class Device extends EventEmitter {
   getDescription(): string {
     return this.description;
   }
+  getErrorMessage(correlationToken: string): AlexaErrorResponse {
+    return new AlexaErrorResponse(
+      correlationToken,
+      this.rootTopic,
+      this.endpointId,
+      this.mqttClient
+    );
+  }
   getStatusMessage(
     correlationToken: string,
     isResponse = false,
-    isDeferred = false,
+    isDeferred = false
   ): AlexaStatusMessage {
     return new AlexaStatusMessage(
       correlationToken,
